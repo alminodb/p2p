@@ -69,7 +69,7 @@ function Register() {
                 },
             };
 
-            const { data } = await axios.post("/api/user", { name, email, password }, config);
+            const { data } = await axios.post("/api/user", { name, email, password }); // add config here
 
             toast({
                 title: "Registration successfull!",
