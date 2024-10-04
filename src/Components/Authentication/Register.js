@@ -1,5 +1,7 @@
-import { Button, FormControl, FormLabel, Input, InputGroup, InputRightElement, VStack } from '@chakra-ui/react'
+import { Button, FormControl, FormLabel, Input, InputGroup, InputRightElement, VStack, useToast } from '@chakra-ui/react'
+import axios from 'axios';
 import React, { useState } from 'react'
+import { useHistory } from 'react-router-dom/cjs/react-router-dom';
 
 function Register() {
 
@@ -8,6 +10,10 @@ function Register() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [passwordShown, setPasswordShown] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const toast = useToast();
+    const history = useHistory();
 
     const nameHandler = (event) => {
         setName(event.target.value);
@@ -29,8 +35,66 @@ function Register() {
         setPasswordShown(passwordShown ? false : true);
     }
 
-    const submitHandler = (event) => {
-        event.preventDefaults();
+    const submitHandler = async () => {
+        setIsLoading(true);
+
+        if (!name || !email || !password || !confirmPassword) {
+            toast({
+                title: "You must fill all fields!",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "top"
+            });
+            setIsLoading(false);
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            toast({
+                title: "Passwords do not match!",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "top"
+            });
+            setIsLoading(false);
+            return;
+        }
+
+        try {
+            const config = {
+                headers: {
+                    "Content-type": "application/json",
+                },
+            };
+
+            const { data } = await axios.post("/api/user", { name, email, password }, config);
+
+            toast({
+                title: "Registration successfull!",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: "top"
+            });
+
+            localStorage.setItem("userInfo", JSON.stringify(data));
+            setIsLoading(false);
+            history.push("chats");
+
+        } catch (error) {
+            toast({
+                title: "Error occured!",
+                description: error.response.data.message,
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "top"
+            });
+            setIsLoading(false);
+        }
+
     }
 
     return (
@@ -55,7 +119,7 @@ function Register() {
                         <InputRightElement><Button onClick={passwordShownHandler}>{passwordShown ? "Hide" : "Show"}</Button></InputRightElement>
                     </InputGroup>
 
-                    <Button mt="20px">Register</Button>
+                    <Button type="submit" mt="20px" isLoading={isLoading} onClick={submitHandler}>Register</Button>
 
                 </FormControl>
             </VStack>
