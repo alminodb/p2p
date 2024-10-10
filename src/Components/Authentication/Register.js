@@ -1,7 +1,7 @@
 import { Button, FormControl, FormLabel, Input, InputGroup, InputRightElement, VStack, useToast } from '@chakra-ui/react'
 import axios from 'axios';
 import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom/cjs/react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 function Register() {
 

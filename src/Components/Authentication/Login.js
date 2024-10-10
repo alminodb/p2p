@@ -1,7 +1,8 @@
 import { Button, FormControl, FormLabel, Input, InputGroup, InputRightElement, useToast, VStack } from '@chakra-ui/react'
 import axios from 'axios';
 import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom/cjs/react-router-dom';
+import { useHistory } from 'react-router-dom';
+import { ChatState } from '../../Context/ChatProvider';
 
 function Login() {
 
@@ -11,6 +12,8 @@ function Login() {
 
     const toast = useToast();
     const history = useHistory();
+
+    const { setUser } = ChatState();
 
     const emailHandler = (event) => {
         setEmail(event.target.value);
@@ -24,7 +27,7 @@ function Login() {
         setPasswordShown(passwordShown ? false : true);
     }
 
-    const submitHandler = async() => {
+    const submitHandler = async () => {
         if (!email || !password) {
             toast({
                 title: "You must fill all fields!",
@@ -47,8 +50,9 @@ function Login() {
                 position: "top"
             });
 
+            setUser(data);
             localStorage.setItem("userInfo", JSON.stringify(data));
-            history.push("chats");
+            history.push("/chats");
         } catch (error) {
             toast({
                 title: "Error occured!",
@@ -75,10 +79,10 @@ function Login() {
                     </InputGroup>
 
                     <Button type='submit' mt="20px" onClick={submitHandler}>Login</Button>
-                    <Button mt="20px" onClick={() => {
+                    {/* <Button mt="20px" onClick={() => {
                         setEmail("almin@example.com");
-                        setPassword("123123123");
-                    }} colorScheme='red'>Give me auto credentials</Button>
+                        setPassword("123123");
+                    }} colorScheme='red'>Give me auto credentials</Button> */}
 
                 </FormControl>
             </VStack>
