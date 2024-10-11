@@ -65,7 +65,7 @@ function Register() {
         try {
             const config = {
                 headers: {
-                    "Content-type": "application/json",
+                    "Content-type": "application/json"
                 },
             };
 
