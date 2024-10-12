@@ -1,13 +1,34 @@
 import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
-import { Avatar, Box, Button, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, Input, Menu, MenuButton, MenuDivider, MenuItem, MenuList, Spinner, Text, Tooltip, useDisclosure, useToast } from "@chakra-ui/react";
+import {
+    Avatar,
+    Box,
+    Button,
+    Drawer,
+    DrawerBody,
+    DrawerContent,
+    DrawerHeader,
+    DrawerOverlay,
+    Input,
+    Menu,
+    MenuButton,
+    MenuDivider,
+    MenuItem,
+    MenuList,
+    Spinner,
+    Text,
+    Tooltip,
+    useDisclosure,
+    useToast
+} from "@chakra-ui/react";
 import { useState } from "react";
 import { ChatState } from "../../Context/ChatProvider";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import ChatLoading from "./ChatLoading";
 import UserListItem from "./UserListItem";
+import UserProfileModal from "../../Modals/UserProfileModal";
 
-const SideDrawer = ({fetchAgain, setFetchAgain}) => {
+const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
 
     const history = useHistory();
     const toast = useToast();
@@ -135,7 +156,9 @@ const SideDrawer = ({fetchAgain, setFetchAgain}) => {
                             <Avatar size='sm' cursor="pointer" name={user.name} src={user.pic} />
                         </MenuButton>
                         <MenuList>
-                            <MenuItem>My profile</MenuItem>
+                            <UserProfileModal user={user}>
+                                <MenuItem>My profile</MenuItem>
+                            </UserProfileModal>
                             <MenuDivider />
                             <MenuItem color="red" fontWeight="bold" onClick={logoutHandler}>Logout</MenuItem>
                         </MenuList>

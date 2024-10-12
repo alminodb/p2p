@@ -4,6 +4,8 @@ import { Box, Button, Stack, useToast, Text } from "@chakra-ui/react";
 import axios from "axios";
 import ChatLoading from "../../SideDrawer/ChatLoading";
 import { getSender } from "../../../Config/ChatLogic";
+import GroupChatFormModal from "../../../Modals/GroupChatFormModal";
+import { AddIcon } from "@chakra-ui/icons";
 
 const MyChats = ({ fetchAgain }) => {
 
@@ -60,16 +62,16 @@ const MyChats = ({ fetchAgain }) => {
                 justifyContent="space-between"
                 alignItems="center"
             >
-                My Chats
-                {/* <GroupChatModal>
+                Chats
+                <GroupChatFormModal>
                     <Button
                         display="flex"
-                        fontSize={{ base: "17px", md: "10px", lg: "17px" }}
+                        fontSize={{ base: "13px", md: "10px", lg: "13px" }}
                         rightIcon={<AddIcon />}
                     >
                         New Group Chat
                     </Button>
-                </GroupChatModal> */}
+                </GroupChatFormModal>
             </Box>
             <Box
                 display="flex"
