@@ -16,7 +16,7 @@ const UserListBadge = ({ user, handleFunction, admin }) => {
             cursor="pointer"
         >
             {user.name}
-            {admin === user._id && <span> (Admin)</span>}
+            {admin?._id === user?._id && <span style={{color: "orange"}}> (Admin)</span>}
             <CloseIcon pl={1} onClick={handleFunction} _hover={{color: "black"}} />
         </Badge>
     );

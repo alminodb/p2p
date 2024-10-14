@@ -3,7 +3,7 @@ import React from 'react'
 
 const UserList = ({children}) => {
   return (
-    <VStack mt={5} display="flex">
+    <VStack mt={5} display="flex" w="100%">
         {children}
     </VStack>
   );

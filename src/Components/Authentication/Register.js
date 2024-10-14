@@ -2,6 +2,7 @@ import { Button, FormControl, FormLabel, Input, InputGroup, InputRightElement, V
 import axios from 'axios';
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom';
+import { ChatState } from '../../Context/ChatProvider';
 
 function Register() {
 
@@ -11,6 +12,8 @@ function Register() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [passwordShown, setPasswordShown] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
+    const { setUser, setSelectedChat } = ChatState();
 
     const toast = useToast();
     const history = useHistory();
@@ -69,7 +72,7 @@ function Register() {
                 },
             };
 
-            const { data } = await axios.post("/api/user", { name, email, password }); // add config here
+            const { data } = await axios.post("/api/user", { name, email, password }, config); // add config here
 
             toast({
                 title: "Registration successfull!",
@@ -80,6 +83,8 @@ function Register() {
             });
 
             localStorage.setItem("userInfo", JSON.stringify(data));
+            setUser(data);
+            setSelectedChat("");
             setIsLoading(false);
             history.push("chats");
 

@@ -13,7 +13,7 @@ function Login() {
     const toast = useToast();
     const history = useHistory();
 
-    const { setUser } = ChatState();
+    const { setUser, setSelectedChat } = ChatState();
 
     const emailHandler = (event) => {
         setEmail(event.target.value);
@@ -51,6 +51,7 @@ function Login() {
             });
 
             setUser(data);
+            setSelectedChat("");
             localStorage.setItem("userInfo", JSON.stringify(data));
             history.push("/chats");
         } catch (error) {

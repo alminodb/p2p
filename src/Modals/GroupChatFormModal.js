@@ -79,6 +79,7 @@ const GroupChatFormModal = ({ children }) => {
                 isClosable: true,
                 position: "top"
             });
+            return;
         }
         else if (added && added.length < 2) {
             toast({
@@ -88,6 +89,7 @@ const GroupChatFormModal = ({ children }) => {
                 isClosable: true,
                 position: "top"
             });
+            return;
         }
 
         try {
@@ -110,6 +112,9 @@ const GroupChatFormModal = ({ children }) => {
                 isClosable: true,
                 position: "top",
             });
+
+            setGroupName("");
+            setAdded([]);
         } catch (error) {
             toast({
                 title: "Error occured!",
