@@ -7,7 +7,7 @@ import UserListBadge from './UserList/UserListBadge';
 import axios from 'axios';
 import UserListItem from './UserList/UserListItem';
 
-const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain }) => {
+const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
 
     const { onOpen, onClose, isOpen } = useDisclosure();
     const { user, selectedChat, setSelectedChat } = ChatState();

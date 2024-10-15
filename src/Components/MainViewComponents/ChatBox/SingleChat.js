@@ -1,20 +1,121 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { ChatState } from '../../../Context/ChatProvider';
-import { Box, FormControl, IconButton, Input, Spinner, Text } from '@chakra-ui/react';
+import { Box, Button, FormControl, IconButton, Input, Spinner, Text, useToast } from '@chakra-ui/react';
 import { ArrowBackIcon, InfoIcon, ViewIcon } from '@chakra-ui/icons';
 import { getSender, getSenderFull } from '../../../Config/ChatLogic';
 import UserProfileModal from '../../../Modals/UserProfileModal';
 import UpdateGroupChatModal from '../../../Modals/UpdateGroupChatModal';
+import axios from 'axios';
+import ScrollableChat from './ScrollableChat';
+import "./styles.css";
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     const { selectedChat, setSelectedChat, user } = ChatState();
 
     const [loading, setLoading] = useState(false);
+    const [messages, setMessages] = useState([]);
+
+    const newMessage = useRef();
+
+    const toast = useToast();
+
+    const fetchMessages = async () => {
+        if (selectedChat) {
+            setLoading(true);
+            try {
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${user.token}`
+                    }
+                };
+
+                const { data } = await axios.get(`/api/message/${selectedChat._id}`, config);
+
+                setMessages(data);
+                setLoading(false);
+            } catch (error) {
+                toast({
+                    title: "Error occured!",
+                    description: error.message,
+                    status: "error",
+                    duration: 3000,
+                    isClosable: true,
+                    position: "top"
+                });
+            }
+        }
+    }
+
+    const sendMessage = async (event) => {
+        if (event.key === "Enter" && newMessage.current.value) {
+
+            try {
+                let content = newMessage.current.value;
+                let chatId = selectedChat._id;
+
+                const config = {
+                    headers: {
+                        "Content-type": "application/json",
+                        Authorization: `Bearer ${user.token}`
+                    }
+                };
+
+                const { data } = await axios.post("/api/message/", { content, chatId }, config);
+
+                setFetchAgain(!fetchAgain);
+                newMessage.current.value = "";
+                setMessages([...messages, data]);
+
+            } catch (error) {
+                toast({
+                    title: "Error occured!",
+                    description: error.message,
+                    status: "error",
+                    duration: 3000,
+                    isClosable: true,
+                    position: "top"
+                });
+            }
+        }
+    }
+
+    const sendMessageButtonHandler = async () => {
+        if (newMessage.current.value) {
+
+            try {
+                let content = newMessage.current.value;
+                let chatId = selectedChat._id;
+
+                const config = {
+                    headers: {
+                        "Content-type": "application/json",
+                        Authorization: `Bearer ${user.token}`
+                    }
+                };
+
+                const { data } = await axios.post("/api/message/", { content, chatId }, config);
+
+                setFetchAgain(!fetchAgain);
+                newMessage.current.value = "";
+                setMessages([...messages, data]);
+
+            } catch (error) {
+                toast({
+                    title: "Error occured!",
+                    description: error.message,
+                    status: "error",
+                    duration: 3000,
+                    isClosable: true,
+                    position: "top"
+                });
+            }
+        }
+    }
 
     useEffect(() => {
-        console.log(selectedChat.groupAdmin)
-    }, [])
+        fetchMessages();
+    }, [selectedChat])
 
     return (
         <>
@@ -35,24 +136,24 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                             icon={<ArrowBackIcon />}
                             onClick={() => setSelectedChat("")}
                         />
-                        {/* {messages && */}
-                        {(!selectedChat.isGroupChat ? (
-                            <>
-                                {getSender(user, selectedChat.users)}
-                                <UserProfileModal
-                                    user={getSenderFull(user, selectedChat.users)}
-                                ><InfoIcon _hover={{ cursor: "pointer" }} /></UserProfileModal>
-                            </>
-                        ) : (
-                            <>
-                                {selectedChat.chatName}
-                                <UpdateGroupChatModal
-                                    // fetchMessages={fetchMessages}
-                                    fetchAgain={fetchAgain}
-                                    setFetchAgain={setFetchAgain}
-                                />
-                            </>
-                        ))
+                        {messages &&
+                            (!selectedChat.isGroupChat ? (
+                                <>
+                                    {getSender(user, selectedChat.users)}
+                                    <UserProfileModal
+                                        user={getSenderFull(user, selectedChat.users)}
+                                    ><InfoIcon _hover={{ cursor: "pointer" }} /></UserProfileModal>
+                                </>
+                            ) : (
+                                <>
+                                    {selectedChat.chatName}
+                                    <UpdateGroupChatModal
+                                        fetchMessages={fetchMessages}
+                                        fetchAgain={fetchAgain}
+                                        setFetchAgain={setFetchAgain}
+                                    />
+                                </>
+                            ))
                         }
                     </Text>
                     <Box
@@ -76,21 +177,27 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                             />
                         ) : (
                             <div className="messages">
-                                {/* <ScrollableChat messages={messages} /> */}
+                                <ScrollableChat messages={messages} />
                             </div>
                         )}
 
                         <FormControl
-                            idisplay="first-name"
+                            id="first-name"
                             isRequired
                             mt={3}
+                            onKeyDown={sendMessage}
+                            display="flex"
+                            columnGap="15px"
                         >
 
                             <Input
                                 variant="filled"
                                 bg="#E0E0E0"
                                 placeholder="Enter a message.."
+                                ref={newMessage}
                             />
+
+                            <Button colorScheme='blue' onClick={sendMessageButtonHandler}>Send</Button>
                         </FormControl>
                     </Box>
                 </>
