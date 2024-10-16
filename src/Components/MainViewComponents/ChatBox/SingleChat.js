@@ -11,7 +11,7 @@ import "./styles.css";
 import { io } from 'socket.io-client';
 
 const ENDPOINT = "http://localhost:5000";
-var socket, selectedChatCompare;
+var socket;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
@@ -39,7 +39,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
                 setMessages(data);
                 setLoading(false);
-                // socket.emit("join chat", selectedChat._id);
+                socket.emit("join chat", selectedChat._id);
 
             } catch (error) {
                 toast({
@@ -130,30 +130,16 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     useEffect(() => {
         fetchMessages();
-
-        selectedChatCompare = selectedChat;
         socket.emit("get rooms");
     }, [selectedChat]);
 
     useEffect(() => {
-        socket.on("message recieved", (newMessageRecieved) => {
-            // if (
-            //     !selectedChatCompare || // if chat is not selected or doesn't match current chat
-            //     selectedChatCompare._id !== newMessageRecieved.chat._id
-            // ) {
-            //     // if (!notification.includes(newMessageRecieved)) {
-            //     //     setNotification([newMessageRecieved, ...notification]);
-            //     //     setFetchAgain(!fetchAgain);
-            //     // }
-            //     setFetchAgain(!fetchAgain);
-            // } else {
-            //     setMessages([...messages, newMessageRecieved]);
-            // }
+        socket.on("message received", (messageReceived) => {
 
-            if(selectedChatCompare && selectedChatCompare._id == newMessageRecieved.chat._id) {
-                setMessages([...messages, newMessageRecieved]);
+            if(selectedChat && selectedChat._id === messageReceived.chat._id) {
+                setMessages([...messages, messageReceived]);
             }
-            else if(!selectedChat || selectedChatCompare._id != newMessageRecieved.chat._id) {
+            else if(!selectedChat || selectedChat._id !== messageReceived.chat._id) {
                 setFetchAgain(!fetchAgain);
             }
         });

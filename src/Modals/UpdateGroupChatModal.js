@@ -1,4 +1,4 @@
-import { Badge, Box, Button, FormControl, FormLabel, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner, Stack, useDisclosure, useToast, VStack } from '@chakra-ui/react'
+import { Box, Button, FormControl, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner, useDisclosure, useToast } from '@chakra-ui/react'
 import React, { useEffect, useRef, useState } from 'react'
 import { ChatState } from '../Context/ChatProvider';
 import UserList from './UserList/UserList';
@@ -7,7 +7,7 @@ import UserListBadge from './UserList/UserListBadge';
 import axios from 'axios';
 import UserListItem from './UserList/UserListItem';
 
-const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
+const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain }) => {
 
     const { onOpen, onClose, isOpen } = useDisclosure();
     const { user, selectedChat, setSelectedChat } = ChatState();
@@ -214,7 +214,7 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
             };
 
             try {
-                const { data } = await axios.put("/api/chat/group/delete", { chatId: selectedChat._id }, config);
+                await axios.put("/api/chat/group/delete", { chatId: selectedChat._id }, config);
 
                 toast({
                     title: `You left and deleted group ${selectedChat.chatName}`,
@@ -245,7 +245,7 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
                 }
             };
 
-            const { data } = await axios.put("/api/chat/group/remove", { chatId: selectedChat._id, userId: user._id }, config);
+            await axios.put("/api/chat/group/remove", { chatId: selectedChat._id, userId: user._id }, config);
 
             toast({
                 title: `You left "${selectedChat.chatName}"`,

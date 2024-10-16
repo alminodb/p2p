@@ -1,9 +1,8 @@
-import { Badge, Box, Button, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner, Stack, useDisclosure, useToast, VStack } from '@chakra-ui/react'
+import { Button, FormControl, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner, Stack, useDisclosure, useToast } from '@chakra-ui/react'
 import axios from 'axios';
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import UserList from './UserList/UserList';
 import UserListItem from './UserList/UserListItem';
-import { CloseIcon } from '@chakra-ui/icons';
 import UserListBadge from './UserList/UserListBadge';
 import { ChatState } from '../Context/ChatProvider';
 
