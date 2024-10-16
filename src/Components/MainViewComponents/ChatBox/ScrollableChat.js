@@ -13,11 +13,6 @@ import { useEffect } from "react";
 const ScrollableChat = ({ messages }) => {
     const { user } = ChatState();
 
-    useEffect(() => {
-        console.log(messages);
-        
-    }, [])
-
     return (
         <ScrollableFeed>
             {messages &&
