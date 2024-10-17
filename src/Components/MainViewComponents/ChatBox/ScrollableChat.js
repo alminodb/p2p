@@ -8,14 +8,32 @@ import {
     isSameUser,
 } from "../../../Config/ChatLogic";
 import { ChatState } from "../../../Context/ChatProvider";
+import { useEffect, useRef, useState } from "react";
 
 const ScrollableChat = ({ messages }) => {
     const { user } = ChatState();
 
+    const [loadedMessages, setLoadedMessages] = useState([]);
+    const [loaded, setLoaded] = useState(20);
+
+    const scrollRef = useRef();
+
+    const handleScroll = () => {
+        // console.log(scrollRef.current.wrapperRef.current.scrollTop);
+        if(scrollRef.current.wrapperRef.current.scrollTop === 0) {
+            setLoaded(loaded + 15);
+        }
+    }
+
+    useEffect(() => {
+        setLoadedMessages(messages.map((msg, index) => (index < 5) && msg));
+        // setLoadedMessages(messages)
+    }, [])
+
     return (
-        <ScrollableFeed>
+        <ScrollableFeed className="ajdebrateee" ref={scrollRef} onScroll={handleScroll}>
             {messages &&
-                messages.map((m, i) => (
+                messages.map((m, i) => (i > messages.length-(loaded+2)) && (
                     <div style={{ display: "flex" }} key={m._id}>
                         {(isSameSender(messages, m, i, user._id) ||
                             isLastMessage(messages, i, user._id)) && (

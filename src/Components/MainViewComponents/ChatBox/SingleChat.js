@@ -11,7 +11,7 @@ import "./styles.css";
 import { io } from 'socket.io-client';
 
 const ENDPOINT = "http://localhost:5000";
-var socket;
+var socket, selChat;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
@@ -20,6 +20,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const [loading, setLoading] = useState(false);
     const [messages, setMessages] = useState([]);
     const [socketConnected, setSocketConnected] = useState(false);
+    const [notifications, setNotifications] = useState([]);
 
     const newMessage = useRef();
 
@@ -130,17 +131,21 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     useEffect(() => {
         fetchMessages();
-        socket.emit("get rooms");
+        selChat = selectedChat;
     }, [selectedChat]);
 
     useEffect(() => {
         socket.on("message received", (messageReceived) => {
-
-            if(selectedChat && selectedChat._id === messageReceived.chat._id) {
+            if (
+                !selChat ||
+                selChat._id !== messageReceived.chat._id
+            ) {
+                if(!notifications.includes(messageReceived)) {
+                    setNotifications([messageReceived, ...notifications]);
+                    setFetchAgain(!fetchAgain);
+                }
+            } else {
                 setMessages([...messages, messageReceived]);
-            }
-            else if(!selectedChat || selectedChat._id !== messageReceived.chat._id) {
-                setFetchAgain(!fetchAgain);
             }
         });
     });
