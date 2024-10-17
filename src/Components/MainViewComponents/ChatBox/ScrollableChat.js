@@ -13,27 +13,29 @@ import { useEffect, useRef, useState } from "react";
 const ScrollableChat = ({ messages }) => {
     const { user } = ChatState();
 
-    const [loadedMessages, setLoadedMessages] = useState([]);
     const [loaded, setLoaded] = useState(20);
+    const [scrollAgain, setScrollAgain] = useState(false);
+    const [heightCompare, setheightCompare] = useState(0);
 
     const scrollRef = useRef();
 
     const handleScroll = () => {
-        // console.log(scrollRef.current.wrapperRef.current.scrollTop);
-        if(scrollRef.current.wrapperRef.current.scrollTop === 0) {
+        if (scrollRef.current.wrapperRef.current.scrollTop === 0) {
+            setheightCompare(scrollRef.current.wrapperRef.current.scrollHeight);
             setLoaded(loaded + 15);
+            setheightCompare(scrollRef.current.wrapperRef.current.scrollHeight);
         }
     }
 
+
     useEffect(() => {
-        setLoadedMessages(messages.map((msg, index) => (index < 5) && msg));
-        // setLoadedMessages(messages)
-    }, [])
+        scrollRef.current.wrapperRef.current.scrollTo({left: 0, top: scrollRef.current.wrapperRef.current.scrollHeight - heightCompare})
+    }, [heightCompare]);
 
     return (
         <ScrollableFeed className="ajdebrateee" ref={scrollRef} onScroll={handleScroll}>
             {messages &&
-                messages.map((m, i) => (i > messages.length-(loaded+2)) && (
+                messages.map((m, i) => (i > messages.length - (loaded + 2)) && (
                     <div style={{ display: "flex" }} key={m._id}>
                         {(isSameSender(messages, m, i, user._id) ||
                             isLastMessage(messages, i, user._id)) && (
