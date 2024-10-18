@@ -3,13 +3,14 @@ import { ChatState } from "../../../Context/ChatProvider";
 import { Box, Button, Stack, useToast, Text } from "@chakra-ui/react";
 import axios from "axios";
 import ChatLoading from "../../SideDrawer/ChatLoading";
-import { getSender } from "../../../Config/ChatLogic";
+import { getSender, isActiveUser } from "../../../Config/ChatLogic";
 import GroupChatFormModal from "../../../Modals/GroupChatFormModal";
 import { AddIcon } from "@chakra-ui/icons";
+import OnlineBadge from "./OnlineBadge";
 
 const MyChats = ({ fetchAgain }) => {
 
-    const { selectedChat, setSelectedChat, chats, setChats, user, } = ChatState();
+    const { selectedChat, setSelectedChat, chats, setChats, user, activeUsers } = ChatState();
     const [loggedUser, setLoggedUser] = useState(false);
 
     const toast = useToast();
@@ -100,6 +101,10 @@ const MyChats = ({ fetchAgain }) => {
                                     {!chat.isGroupChat && chat.users
                                         ? getSender(loggedUser, chat.users)
                                         : chat.chatName}
+                                    {
+                                        (<OnlineBadge isOnline={isActiveUser(user, activeUsers, chat.users)} />)
+                                    }
+                                    
                                 </Text>
                                 {chat.latestMessage && (
                                     <Text fontSize="xs">

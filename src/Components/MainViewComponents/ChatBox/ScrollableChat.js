@@ -22,7 +22,7 @@ const ScrollableChat = ({ messages }) => {
     const handleScroll = () => {
         if (scrollRef.current.wrapperRef.current.scrollTop === 0) {
             setheightCompare(scrollRef.current.wrapperRef.current.scrollHeight);
-            setLoaded(loaded + 15);
+            setLoaded(loaded + 20);
             setheightCompare(scrollRef.current.wrapperRef.current.scrollHeight);
         }
     }

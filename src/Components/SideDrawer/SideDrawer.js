@@ -34,7 +34,7 @@ const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
     const toast = useToast();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    const { user, setUser, setSelectedChat, chats, setChats } = ChatState();
+    const { user, setUser, setSelectedChat, chats, setChats, notifications } = ChatState();
 
     const [search, setSearch] = useState("");
     const [searchResult, setSearchResult] = useState([]);
@@ -146,7 +146,7 @@ const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
 
                 <div>
                     <Menu>
-                        <MenuButton p={1}>
+                        <MenuButton p={1} onClick={() => console.log(notifications)}>
                             <BellIcon fontSize="2xl" m={1} />
                         </MenuButton>
                     </Menu>

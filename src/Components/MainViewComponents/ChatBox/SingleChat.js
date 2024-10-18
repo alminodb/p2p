@@ -15,12 +15,11 @@ var socket, selChat;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
-    const { selectedChat, setSelectedChat, user } = ChatState();
+    const { selectedChat, setSelectedChat, user, notifications, setNotifications, activeUsers, setActiveUsers } = ChatState();
 
     const [loading, setLoading] = useState(false);
     const [messages, setMessages] = useState([]);
     const [socketConnected, setSocketConnected] = useState(false);
-    const [notifications, setNotifications] = useState([]);
 
     const newMessage = useRef();
 
@@ -127,6 +126,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         socket = io(ENDPOINT);
         socket.emit("setup", user);
         socket.on("connected", () => setSocketConnected(true));
+
+        socket.emit("find active users", user);
     }, []);
 
     useEffect(() => {
@@ -140,7 +141,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 !selChat ||
                 selChat._id !== messageReceived.chat._id
             ) {
-                if(!notifications.includes(messageReceived)) {
+                if (!notifications.includes(messageReceived)) {
                     setNotifications([messageReceived, ...notifications]);
                     setFetchAgain(!fetchAgain);
                 }
@@ -148,6 +149,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 setMessages([...messages, messageReceived]);
             }
         });
+        socket.on("get active users", (active) => {
+            setActiveUsers(active);
+            setFetchAgain(!fetchAgain);
+        })
+        
     });
 
     return (

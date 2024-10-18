@@ -7,6 +7,8 @@ const ChatProvider = ({ children }) => {
     const [user, setUser] = useState();
     const [selectedChat, setSelectedChat] = useState("");
     const [chats, setChats] = useState([]);
+    const [notifications, setNotifications] = useState([]);
+    const [activeUsers, setActiveUsers] = useState([]);
 
     const history = useHistory();
 
@@ -25,7 +27,11 @@ const ChatProvider = ({ children }) => {
                 selectedChat,
                 setSelectedChat,
                 chats,
-                setChats
+                setChats,
+                notifications,
+                setNotifications,
+                activeUsers,
+                setActiveUsers
             }}
         >
             {children}
