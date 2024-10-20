@@ -27,6 +27,7 @@ import axios from "axios";
 import ChatLoading from "./ChatLoading";
 import UserListItem from "./UserListItem";
 import UserProfileModal from "../../Modals/UserProfileModal";
+import { SocketState } from "../../Context/SocketProvider";
 
 const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
 
@@ -35,6 +36,7 @@ const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const { user, setUser, setSelectedChat, chats, setChats, notifications } = ChatState();
+    const socket = SocketState();
 
     const [search, setSearch] = useState("");
     const [searchResult, setSearchResult] = useState([]);
@@ -43,6 +45,7 @@ const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
 
     const logoutHandler = () => {
         localStorage.removeItem("userInfo");
+        socket.emit("log out", user);
         toast({
             title: "You are now signed out.",
             status: "warning",

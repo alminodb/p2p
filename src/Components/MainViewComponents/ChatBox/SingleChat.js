@@ -9,17 +9,18 @@ import axios from 'axios';
 import ScrollableChat from './ScrollableChat';
 import "./styles.css";
 import { io } from 'socket.io-client';
+import { SocketState } from '../../../Context/SocketProvider';
 
-const ENDPOINT = "http://localhost:5000";
-var socket, selChat;
+var selChat;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     const { selectedChat, setSelectedChat, user, notifications, setNotifications, activeUsers, setActiveUsers } = ChatState();
 
+    const socket = SocketState();
+
     const [loading, setLoading] = useState(false);
     const [messages, setMessages] = useState([]);
-    const [socketConnected, setSocketConnected] = useState(false);
 
     const newMessage = useRef();
 
@@ -39,7 +40,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
                 setMessages(data);
                 setLoading(false);
-                socket.emit("join chat", selectedChat._id);
+                // socket.emit("join chat", selectedChat._id);
 
             } catch (error) {
                 toast({
@@ -72,7 +73,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
                 setFetchAgain(!fetchAgain);
                 newMessage.current.value = "";
-                socket.emit("new message", data);
+                // socket.emit("new message", data);
                 setMessages([...messages, data]);
 
             } catch (error) {
@@ -106,7 +107,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
                 setFetchAgain(!fetchAgain);
                 newMessage.current.value = "";
-                socket.emit("new message", data);
+                // socket.emit("new message", data);
                 setMessages([...messages, data]);
 
             } catch (error) {
@@ -123,10 +124,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
 
     useEffect(() => {
-        socket = io(ENDPOINT);
         socket.emit("setup", user);
-        socket.on("connected", () => setSocketConnected(true));
-
         socket.emit("find active users", user);
     }, []);
 
