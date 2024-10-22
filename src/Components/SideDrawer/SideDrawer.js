@@ -187,7 +187,7 @@ const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
                             loading ? (
                                 <ChatLoading />
                             ) : (
-                                searchResult?.map(r => <UserListItem key={r._id} user={r} handleFunction={() => accessChat(r._id)} />)
+                                searchResult?.map(r => <UserListItem key={r._id} listUser={r} handleFunction={() => accessChat(r._id)} />)
                             )
                         }
                         {loadingChat && <Spinner ml="auto" display="flex" />}

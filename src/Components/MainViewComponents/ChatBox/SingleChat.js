@@ -40,7 +40,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
                 setMessages(data);
                 setLoading(false);
-                // socket.emit("join chat", selectedChat._id);
+                socket.emit("join chat", selectedChat._id);
 
             } catch (error) {
                 toast({
@@ -73,7 +73,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
                 setFetchAgain(!fetchAgain);
                 newMessage.current.value = "";
-                // socket.emit("new message", data);
+                socket.emit("new message", data);
                 setMessages([...messages, data]);
 
             } catch (error) {
@@ -107,7 +107,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
                 setFetchAgain(!fetchAgain);
                 newMessage.current.value = "";
-                // socket.emit("new message", data);
+                socket.emit("new message", data);
                 setMessages([...messages, data]);
 
             } catch (error) {
@@ -145,11 +145,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 }
             } else {
                 setMessages([...messages, messageReceived]);
+                setFetchAgain(!fetchAgain);
             }
         });
         socket.on("get active users", (active) => {
             setActiveUsers(active);
             setFetchAgain(!fetchAgain);
+            console.log(active);
         })
         
     });
