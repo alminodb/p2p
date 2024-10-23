@@ -13,6 +13,29 @@ const ChatProvider = ({ children }) => {
 
     const history = useHistory();
 
+    const fetchUser = async (userInfo) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${userInfo.token}`
+                }
+            };
+
+            const { data } = await axios.get("/api/user/me", config);
+            
+            setUser(data);
+            localStorage.setItem("userInfo", JSON.stringify(data));
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        userInfo && fetchUser(userInfo);
+    }, [])
+
     useEffect(() => {
         const userInfo = JSON.parse(localStorage.getItem("userInfo"));
         if (!userInfo) {
@@ -36,6 +59,7 @@ const ChatProvider = ({ children }) => {
                 setNotifications,
                 activeUsers,
                 setActiveUsers,
+                fetchUser
             }}
         >
             {children}

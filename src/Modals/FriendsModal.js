@@ -27,7 +27,7 @@ const FriendsModal = ({ children, accessChat }) => {
     const [friends, setFriends] = useState([]);
     const [pendingFriends, setPendingFriends] = useState([]);
 
-    const { user } = ChatState();
+    const { user, fetchUser } = ChatState();
 
     const toast = useToast();
 
@@ -80,6 +80,7 @@ const FriendsModal = ({ children, accessChat }) => {
             });
 
             fetchFriends();
+            fetchUser(user);
         } catch (error) {
             toast({
                 title: "Error occured!",
@@ -112,6 +113,7 @@ const FriendsModal = ({ children, accessChat }) => {
             });
 
             fetchFriends();
+            fetchUser(user);
         } catch (error) {
             toast({
                 title: "Error occured!",
@@ -144,6 +146,7 @@ const FriendsModal = ({ children, accessChat }) => {
             });
 
             fetchFriends();
+            fetchUser(user);
         } catch (error) {
             toast({
                 title: "Error occured!",
