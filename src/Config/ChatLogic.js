@@ -45,13 +45,5 @@ export const getSenderFull = (loggedUser, users) => {
 };
 
 export const isActiveUser = (myself, activeUsers, chatUsers) => {
-    var isActive = false;
-    chatUsers?.forEach((cu) => {
-        if(cu._id !== myself._id) {
-            if (activeUsers.includes(cu._id)) {
-                isActive = true;
-            }
-        }
-    })
-    return isActive;
+    return activeUsers?.some(activeUser => chatUsers.some(chatUser => activeUser.userId === chatUser._id && activeUser.userId !== myself._id));
 }

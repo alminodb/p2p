@@ -150,8 +150,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         });
         socket.on("get active users", (active) => {
             setActiveUsers(active);
-            setFetchAgain(!fetchAgain);
-            console.log(active);
+            // setFetchAgain(!fetchAgain);
         })
         
     });

@@ -20,7 +20,7 @@ import {
     useDisclosure,
     useToast
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChatState } from "../../Context/ChatProvider";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
@@ -28,6 +28,7 @@ import ChatLoading from "./ChatLoading";
 import UserListItem from "./UserListItem";
 import UserProfileModal from "../../Modals/UserProfileModal";
 import { SocketState } from "../../Context/SocketProvider";
+import FriendsModal from "../../Modals/FriendsModal";
 
 const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
 
@@ -42,6 +43,8 @@ const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
     const [searchResult, setSearchResult] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loadingChat, setLoadingChat] = useState();
+    const [friends, setFriends] = useState([]);
+    const [pendingFriends, setPendingFriends] = useState([]);
 
     const logoutHandler = () => {
         localStorage.removeItem("userInfo");
@@ -83,7 +86,7 @@ const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
         } catch (error) {
             toast({
                 title: "Error occured!",
-                description: error.message,
+                description: error.response.data.message,
                 status: "error",
                 duration: 3000,
                 isClosable: true,
@@ -123,7 +126,6 @@ const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
         }
     };
 
-
     return (
         <>
             <Box
@@ -162,6 +164,9 @@ const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
                             <UserProfileModal user={user}>
                                 <MenuItem>My profile</MenuItem>
                             </UserProfileModal>
+                            <FriendsModal accessChat={accessChat}>
+                                <MenuItem>Friends</MenuItem>
+                            </FriendsModal>
                             <MenuDivider />
                             <MenuItem color="red" fontWeight="bold" onClick={logoutHandler}>Logout</MenuItem>
                         </MenuList>
