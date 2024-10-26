@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
+    Avatar,
+    AvatarBadge,
     Box,
     Button,
     Flex,
@@ -13,11 +15,13 @@ import {
     ModalHeader,
     ModalOverlay,
     Spinner,
+    Text,
     useDisclosure,
     useToast,
 } from '@chakra-ui/react';
 import { ChatState } from '../Context/ChatProvider';
 import axios from 'axios';
+import { isActiveUser } from '../Config/ChatLogic';
 
 const FriendsModal = ({ children, accessChat }) => {
 
@@ -27,7 +31,7 @@ const FriendsModal = ({ children, accessChat }) => {
     const [friends, setFriends] = useState([]);
     const [pendingFriends, setPendingFriends] = useState([]);
 
-    const { user, fetchUser } = ChatState();
+    const { user, fetchUser, activeUsers } = ChatState();
 
     const toast = useToast();
 
@@ -217,34 +221,40 @@ const FriendsModal = ({ children, accessChat }) => {
                                 Friends
                             </Box>
                             <List spacing={3}>
-                                {friends.length > 0} : (
-                                {friends.map((friend) => (
-                                    <ListItem key={friend._id}>
-                                        <Flex justify="space-between" align="center">
-                                            <Box>{friend.name}</Box>
-                                            <Box>
-                                                <Button
-                                                    size="sm"
-                                                    colorScheme="blue"
-                                                    mr={2}
-                                                    onClick={() => handleChat(friend._id)}
-                                                >
-                                                    Chat
-                                                </Button>
-                                                <Button
-                                                    size="sm"
-                                                    colorScheme="red"
-                                                    onClick={() => handleRemoveFriend(friend._id)}
-                                                >
-                                                    Remove
-                                                </Button>
-                                            </Box>
-                                        </Flex>
-                                    </ListItem>
-                                ))}
+                                {friends.length > 0 ? (
+                                    friends.map((friend) => (
+                                        <ListItem key={friend._id}>
+                                            <Flex justify="space-between" align="center">
+                                                <Box display="flex" alignItems="center" columnGap="15px">
+                                                    <Avatar>
+                                                        <AvatarBadge boxSize='1.25em' bg={isActiveUser(friend, activeUsers) ? "green.500" : "red.500"} />
+                                                    </Avatar>
+                                                    <Text w={{ base: "120px", md: "200px", lg: "300px" }} fontFamily="Work sans">{friend.name}</Text>
+                                                </Box>
+                                                <Box>
+                                                    <Button
+                                                        size="sm"
+                                                        colorScheme="blue"
+                                                        mr={2}
+                                                        onClick={() => handleChat(friend._id)}
+                                                    >
+                                                        Chat
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        colorScheme="red"
+                                                        onClick={() => handleRemoveFriend(friend._id)}
+                                                    >
+                                                        Remove
+                                                    </Button>
+                                                </Box>
+                                            </Flex>
+                                        </ListItem>
+                                    ))
+
                                 ) : (
-                                <Box>No friends</Box>
-                                )
+                                    <Box>No friends</Box>
+                                )}
                             </List>
                         </Box>
                     </ModalBody>

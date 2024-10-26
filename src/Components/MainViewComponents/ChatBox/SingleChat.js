@@ -15,7 +15,7 @@ var selChat;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
-    const { selectedChat, setSelectedChat, user, notifications, setNotifications, activeUsers, setActiveUsers } = ChatState();
+    const { selectedChat, setSelectedChat, user, notifications, setNotifications, setActiveUsers } = ChatState();
 
     const socket = SocketState();
 
@@ -26,16 +26,17 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     const toast = useToast();
 
+    const config = {
+        headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${user.token}`
+        }
+    };
+
     const fetchMessages = async () => {
         if (selectedChat) {
             setLoading(true);
             try {
-                const config = {
-                    headers: {
-                        Authorization: `Bearer ${user.token}`
-                    }
-                };
-
                 const { data } = await axios.get(`/api/message/${selectedChat._id}`, config);
 
                 setMessages(data);
@@ -55,6 +56,28 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         }
     }
 
+    const sendNotification = async (user_id, chat_id) => {
+        try {
+
+            const { data } = await axios.post("/api/notification", {
+                notificationType: "message",
+                receiver: user_id,
+                chatId: chat_id
+            }, config);
+
+            socket.emit("send notification", data);
+        } catch (error) {
+            toast({
+                title: "Error occured!",
+                description: error.response.data.message,
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top"
+            });
+        }
+    }
+
     const sendMessage = async (event) => {
         if (event.key === "Enter" && newMessage.current.value) {
 
@@ -62,14 +85,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 let content = newMessage.current.value;
                 let chatId = selectedChat._id;
 
-                const config = {
-                    headers: {
-                        "Content-type": "application/json",
-                        Authorization: `Bearer ${user.token}`
-                    }
-                };
-
                 const { data } = await axios.post("/api/message/", { content, chatId }, config);
+
+                selectedChat.users.map((chUser) => {
+                    if (chUser && chUser._id !== user._id) sendNotification(chUser._id, selectedChat._id);
+                });
 
                 setFetchAgain(!fetchAgain);
                 newMessage.current.value = "";
@@ -96,14 +116,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 let content = newMessage.current.value;
                 let chatId = selectedChat._id;
 
-                const config = {
-                    headers: {
-                        "Content-type": "application/json",
-                        Authorization: `Bearer ${user.token}`
-                    }
-                };
-
                 const { data } = await axios.post("/api/message/", { content, chatId }, config);
+
+                selectedChat.users.map((chUser) => {
+                    if (chUser && chUser._id !== user._id) sendNotification(chUser._id, selectedChat._id);
+                });
 
                 setFetchAgain(!fetchAgain);
                 newMessage.current.value = "";
@@ -135,15 +152,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     useEffect(() => {
         socket.on("message received", (messageReceived) => {
-            if (
-                !selChat ||
-                selChat._id !== messageReceived.chat._id
-            ) {
-                if (!notifications.includes(messageReceived)) {
-                    setNotifications([messageReceived, ...notifications]);
-                    setFetchAgain(!fetchAgain);
-                }
-            } else {
+            if (selChat && selChat._id === messageReceived.chat._id) {
                 setMessages([...messages, messageReceived]);
                 setFetchAgain(!fetchAgain);
             }
@@ -151,8 +160,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         socket.on("get active users", (active) => {
             setActiveUsers(active);
             // setFetchAgain(!fetchAgain);
-        })
-        
+        });
+        socket.on("get notification", (notif) => {
+            if (!selChat || selChat._id !== notif.chat._id) {
+                if (!notifications.some((v) => v._id === notif._id)) {
+                    setNotifications([notif, ...notifications]);
+                }
+            }
+        });
     });
 
     return (

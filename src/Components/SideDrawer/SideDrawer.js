@@ -29,6 +29,7 @@ import UserListItem from "./UserListItem";
 import UserProfileModal from "../../Modals/UserProfileModal";
 import { SocketState } from "../../Context/SocketProvider";
 import FriendsModal from "../../Modals/FriendsModal";
+import NotificationMenu from "./Menus/NotificationMenu";
 
 const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
 
@@ -36,15 +37,13 @@ const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
     const toast = useToast();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    const { user, setUser, setSelectedChat, chats, setChats, notifications } = ChatState();
+    const { user, setUser, setSelectedChat, chats, setChats } = ChatState();
     const socket = SocketState();
 
     const [search, setSearch] = useState("");
     const [searchResult, setSearchResult] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loadingChat, setLoadingChat] = useState();
-    const [friends, setFriends] = useState([]);
-    const [pendingFriends, setPendingFriends] = useState([]);
 
     const logoutHandler = () => {
         localStorage.removeItem("userInfo");
@@ -96,7 +95,6 @@ const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
         setLoading(false);
     }
 
-
     const accessChat = async (userId) => {
 
         try {
@@ -117,7 +115,7 @@ const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
         } catch (error) {
             toast({
                 title: "Error fetching the chat",
-                description: error.message,
+                description: error.response.data.message,
                 status: "error",
                 duration: 5000,
                 isClosable: true,
@@ -150,11 +148,11 @@ const SideDrawer = ({ fetchAgain, setFetchAgain }) => {
                 </Text>
 
                 <div>
-                    <Menu>
-                        <MenuButton p={1} onClick={() => console.log(notifications)}>
+                    <NotificationMenu accessChat={accessChat}>
+                        <MenuButton p={1} >
                             <BellIcon fontSize="2xl" m={1} />
                         </MenuButton>
-                    </Menu>
+                    </NotificationMenu>
 
                     <Menu>
                         <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>

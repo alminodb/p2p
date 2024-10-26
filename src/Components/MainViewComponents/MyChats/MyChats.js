@@ -3,7 +3,7 @@ import { ChatState } from "../../../Context/ChatProvider";
 import { Box, Button, Stack, useToast, Text } from "@chakra-ui/react";
 import axios from "axios";
 import ChatLoading from "../../SideDrawer/ChatLoading";
-import { getSender, isActiveUser } from "../../../Config/ChatLogic";
+import { getSender, isActiveChat } from "../../../Config/ChatLogic";
 import GroupChatFormModal from "../../../Modals/GroupChatFormModal";
 import { AddIcon } from "@chakra-ui/icons";
 import OnlineBadge from "./OnlineBadge";
@@ -102,7 +102,7 @@ const MyChats = ({ fetchAgain }) => {
                                         ? getSender(loggedUser, chat.users)
                                         : chat.chatName}
                                     {
-                                        (<OnlineBadge isOnline={isActiveUser(user, activeUsers, chat.users)} />)
+                                        (<OnlineBadge isOnline={isActiveChat(user, activeUsers, chat.users)} />)
                                     }
                                     
                                 </Text>
