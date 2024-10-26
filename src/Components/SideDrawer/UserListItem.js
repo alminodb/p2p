@@ -4,6 +4,7 @@ import { Button, useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
 import { ChatState } from "../../Context/ChatProvider";
+import { SocketState } from "../../Context/SocketProvider";
 
 const UserListItem = ({ listUser, handleFunction }) => {
 
@@ -11,6 +12,15 @@ const UserListItem = ({ listUser, handleFunction }) => {
     const { user } = ChatState();
 
     const toast = useToast();
+
+    const socket = SocketState();
+
+    const config = {
+        headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${user.token}`
+        }
+    }
 
     const handleAddFriend = () => {
 
@@ -30,16 +40,15 @@ const UserListItem = ({ listUser, handleFunction }) => {
 
         if(addFriend) {
             try {
-                const config = {
-                    headers: {
-                        "Content-type": "application/json",
-                        Authorization: `Bearer ${user.token}`
-                    }
-                }
                 const { data } = await axios.post("/api/user/friend/add", { userId: listUser._id }, config);
 
-
+                await axios.post("/api/notification", {
+                    sender: user._id,
+                    receiver: listUser._id,
+                    notificationType: "request"
+                }, config);
                 setAddFriend(false);
+                sendNotification(listUser._id);
                 toast({
                     title: `You added ${listUser.name} as a friend`,
                     status: "success",
@@ -58,6 +67,25 @@ const UserListItem = ({ listUser, handleFunction }) => {
                 });
             }
             setAddFriend(false);
+        }
+    }
+
+    const sendNotification = async (user_id) => {
+        try {
+            const { data } = await axios.post("/api/notification", {
+                notificationType: "request",
+                receiver: user_id
+            }, config);
+            socket.emit("send notification", data);
+        } catch (error) {
+            toast({
+                title: "Error occured!",
+                description: error.response.data.message,
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top"
+            });
         }
     }
 

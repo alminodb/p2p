@@ -31,19 +31,20 @@ const FriendsModal = ({ children, accessChat }) => {
     const [friends, setFriends] = useState([]);
     const [pendingFriends, setPendingFriends] = useState([]);
 
-    const { user, fetchUser, activeUsers } = ChatState();
+    const { user, fetchUser, activeUsers, notifications, setNotifications } = ChatState();
 
     const toast = useToast();
+
+    const config = {
+        headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${user.token}`
+        }
+    };
 
     const fetchFriends = async () => {
         setLoading(true);
         try {
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${user.token}`
-                }
-            }
-
             const { data } = await axios.get(`/api/user/friend/${user._id}`, config);
 
             setFriends(data.friends);
@@ -64,15 +65,27 @@ const FriendsModal = ({ children, accessChat }) => {
         }
     }
 
+    const removeNotification = async (sender) => {
+        try {
+            const notification = notifications.find((notif) => (
+                notif.notificationType === "request" &&
+                notif.sender._id === sender
+            ));
+            await axios.put("/api/notification/delete", { notificationId: notification._id }, config)
+            setNotifications(notifications.filter(n => n._id !== notification._id));
+        } catch (error) {
+            toast({
+                title: "Error occured!",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top"
+            });
+        }
+    }
+
     const handleAccept = async (id) => {
         try {
-            const config = {
-                headers: {
-                    "Content-type": "application/json",
-                    Authorization: `Bearer ${user.token}`
-                }
-            };
-
             const { data } = await axios.post("/api/user/friend/accept", { userId: id }, config);
 
             toast({
@@ -83,6 +96,7 @@ const FriendsModal = ({ children, accessChat }) => {
                 position: "top"
             });
 
+            removeNotification(data._id);
             fetchFriends();
             fetchUser(user);
         } catch (error) {
@@ -99,13 +113,6 @@ const FriendsModal = ({ children, accessChat }) => {
 
     const handleDecline = async (id) => {
         try {
-            const config = {
-                headers: {
-                    "Content-type": "application/json",
-                    Authorization: `Bearer ${user.token}`
-                }
-            };
-
             const { data } = await axios.post("/api/user/friend/decline", { userId: id }, config);
 
             toast({
@@ -132,13 +139,6 @@ const FriendsModal = ({ children, accessChat }) => {
 
     const handleRemoveFriend = async (id) => {
         try {
-            const config = {
-                headers: {
-                    "Content-type": "application/json",
-                    Authorization: `Bearer ${user.token}`
-                }
-            };
-
             const { data } = await axios.post("/api/user/friend/remove", { userId: id }, config);
 
             toast({

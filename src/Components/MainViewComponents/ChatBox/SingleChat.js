@@ -15,7 +15,7 @@ var selChat;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
-    const { selectedChat, setSelectedChat, user, notifications, setNotifications, setActiveUsers } = ChatState();
+    const { selectedChat, setSelectedChat, user, notifications, setNotifications, activeUsers, setActiveUsers } = ChatState();
 
     const socket = SocketState();
 
@@ -58,13 +58,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     const sendNotification = async (user_id, chat_id) => {
         try {
-
             const { data } = await axios.post("/api/notification", {
                 notificationType: "message",
                 receiver: user_id,
                 chatId: chat_id
             }, config);
-
             socket.emit("send notification", data);
         } catch (error) {
             toast({
@@ -162,7 +160,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             // setFetchAgain(!fetchAgain);
         });
         socket.on("get notification", (notif) => {
-            if (!selChat || selChat._id !== notif.chat._id) {
+            if ((notif && notif.notificationType === "message") && (!selChat || selChat._id !== notif.chat._id)) {
+                if (!notifications.some((v) => v._id === notif._id)) {
+                    setNotifications([notif, ...notifications]);
+                }
+            }
+            if (notif && notif.notificationType === "request") {
                 if (!notifications.some((v) => v._id === notif._id)) {
                     setNotifications([notif, ...notifications]);
                 }

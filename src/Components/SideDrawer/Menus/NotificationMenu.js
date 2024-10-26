@@ -8,6 +8,7 @@ import {
 } from '@chakra-ui/react'
 import axios from 'axios';
 import { ChatState } from '../../../Context/ChatProvider';
+import FriendsModal from '../../../Modals/FriendsModal';
 
 const NotificationMenu = ({ children, accessChat }) => {
 
@@ -38,19 +39,37 @@ const NotificationMenu = ({ children, accessChat }) => {
     }
 
     const deleteNotification = async (notification) => {
-        try {
-            accessChat(notification.sender);
-            await axios.put("/api/notification/delete", { notificationId: notification._id }, config);
-            setNotifications(notifications.filter(n => n._id !== notification._id));
-        } catch (error) {
-            toast({
-                title: "Error fetching the chat",
-                description: error.response.data.message,
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-                position: "top",
-            });
+        if (notification && notification.chat && notification.notificationType === "message") {
+            try {
+                accessChat(notification.sender);
+                await axios.put("/api/notification/delete", { notificationId: notification._id }, config);
+                setNotifications(notifications.filter(n => n._id !== notification._id));
+            } catch (error) {
+                toast({
+                    title: "Error fetching the chat",
+                    description: error.response.data.message,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "top",
+                });
+            }
+        }
+        else if (notification && notification.notificationType === "request") {
+            console.log("this is friend request");
+            try {
+                await axios.put("/api/notification/delete", { notificationId: notification._id }, config);
+                setNotifications(notifications.filter(n => n._id !== notification._id));
+            } catch (error) {
+                toast({
+                    title: "Error fetching the chat",
+                    description: error.response.data.message,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "top",
+                });
+            }
         }
     }
 
@@ -71,7 +90,13 @@ const NotificationMenu = ({ children, accessChat }) => {
                 ) : (
                     <MenuList>
                         {(!notifications || notifications.length < 1) ? (<MenuItem>No notifications</MenuItem>) : (
-                            notifications.map((notification) => <MenuItem key={notification._id} onClick={() => deleteNotification(notification)}>{notification.title}</MenuItem>)
+                            notifications.map((notification) => (notification.notificationType === "message") ? (
+                                <MenuItem key={notification._id} onClick={() => deleteNotification(notification)}>{notification.title}</MenuItem>
+                            ) : (
+                                <FriendsModal key={notification._id}>
+                                    <MenuItem >{notification.title}</MenuItem>
+                                </FriendsModal>
+                            ))
                         )}
                     </MenuList>
                 )}
